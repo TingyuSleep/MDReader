@@ -1,0 +1,701 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ------------------------------------------------------------------
+   设计令牌：浅色
+   编辑器、预览、工具栏都从这里取值，主题切换只切 .dark 一个 class
+   ------------------------------------------------------------------ */
+:root {
+  --radius: 0.5rem;
+
+  --background: oklch(0.995 0 0);
+  --foreground: oklch(0.16 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.16 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.16 0 0);
+  --primary: oklch(0.24 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.24 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.96 0 0);
+  --accent-foreground: oklch(0.24 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.918 0 0);
+  --input: oklch(0.918 0 0);
+  --ring: oklch(0.62 0 0);
+
+  /* 应用层专属 */
+  --toolbar-bg: oklch(0.985 0 0);
+  --editor-bg: oklch(1 0 0);
+  --preview-bg: oklch(1 0 0);
+  --code-bg: oklch(0.97 0 0);
+  --scrollbar-thumb: oklch(0.85 0 0);
+
+  /* 编辑器选区。
+     ⚠ 必须带 alpha。选区层被抬到了正文之上（原因见 Editor.tsx 的 editorTheme），
+     半透明才能让下面的文字透出来 —— 和浏览器原生 ::selection 一个路子。
+     写成不透明色会把整段字糊掉。 */
+  --cm-selection-bg: oklch(0.62 0.16 250 / 45%);
+  --cm-selection-bg-dim: oklch(0.62 0.16 250 / 26%);
+
+  /* CodeMirror 语法令牌（编辑区） */
+  --cm-heading: oklch(0.42 0.15 264);
+  --cm-strong: oklch(0.18 0 0);
+  --cm-link: oklch(0.52 0.16 240);
+  --cm-url: oklch(0.52 0.10 200);
+  --cm-code: oklch(0.48 0.14 15);
+  --cm-quote: oklch(0.48 0.06 150);
+  --cm-markup: oklch(0.62 0 0);
+  --cm-sep: oklch(0.58 0 0);
+  --cm-label: oklch(0.50 0.14 300);
+  --cm-comment: oklch(0.60 0 0);
+  --cm-keyword: oklch(0.50 0.20 310);
+  --cm-string: oklch(0.45 0.13 150);
+  --cm-number: oklch(0.50 0.16 40);
+  --cm-bool: oklch(0.50 0.16 40);
+  --cm-type: oklch(0.45 0.13 220);
+  --cm-func: oklch(0.45 0.15 270);
+}
+
+/* 设计令牌：深色 */
+.dark {
+  --background: oklch(0.165 0 0);
+  --foreground: oklch(0.96 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.96 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.96 0 0);
+  --primary: oklch(0.92 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.26 0 0);
+  --secondary-foreground: oklch(0.96 0 0);
+  --muted: oklch(0.26 0 0);
+  --muted-foreground: oklch(0.70 0 0);
+  --accent: oklch(0.29 0 0);
+  --accent-foreground: oklch(0.96 0 0);
+  --destructive: oklch(0.65 0.19 25);
+  --destructive-foreground: oklch(0.96 0 0);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.55 0 0);
+
+  --toolbar-bg: oklch(0.195 0 0);
+  --editor-bg: oklch(0.185 0 0);
+  --preview-bg: oklch(0.165 0 0);
+  --code-bg: oklch(0.235 0 0);
+  --scrollbar-thumb: oklch(0.38 0 0);
+
+  --cm-selection-bg: oklch(0.72 0.14 250 / 38%);
+  --cm-selection-bg-dim: oklch(0.72 0.14 250 / 22%);
+
+  /* CodeMirror 语法令牌（编辑区） */
+  --cm-heading: oklch(0.80 0.12 264);
+  --cm-strong: oklch(0.97 0 0);
+  --cm-link: oklch(0.78 0.12 240);
+  --cm-url: oklch(0.76 0.09 200);
+  --cm-code: oklch(0.80 0.11 15);
+  --cm-quote: oklch(0.78 0.07 150);
+  --cm-markup: oklch(0.58 0 0);
+  --cm-sep: oklch(0.62 0 0);
+  --cm-label: oklch(0.80 0.11 300);
+  --cm-comment: oklch(0.62 0 0);
+  --cm-keyword: oklch(0.82 0.13 310);
+  --cm-string: oklch(0.82 0.12 150);
+  --cm-number: oklch(0.83 0.12 40);
+  --cm-bool: oklch(0.83 0.12 40);
+  --cm-type: oklch(0.80 0.10 220);
+  --cm-func: oklch(0.82 0.11 270);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-toolbar-bg: var(--toolbar-bg);
+  --color-editor-bg: var(--editor-bg);
+  --color-preview-bg: var(--preview-bg);
+  --color-code-bg: var(--code-bg);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    overflow: hidden;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family:
+      "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", system-ui, -apple-system,
+      sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* 桌面应用不需要浏览器那种默认拖拽选中 */
+  button,
+  [role="button"] {
+    user-select: none;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
+    border: 2px solid transparent;
+    background-clip: content-box;
+    border-radius: 9999px;
+  }
+}
+
+/* ------------------------------------------------------------------
+   编辑器选区
+
+   规则本身**不在这里**，在 src/components/Editor.tsx 的 editorTheme 里。这里只放颜色令牌。
+
+   为什么不能写在这儿：CodeMirror 的 drawSelection() 自带一条 baseTheme，选择器是
+   `.cm-editor.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground`
+   （特异性 0-5-0），而且是经 adoptedStyleSheets 注入的 —— 位置在所有 <link> 之后，
+   同特异性时后出现者胜。写在这个文件里就得靠重复类名硬凑到 0-6-0 才压得住；
+   写进 EditorView.theme 只要选择器一样深，就能借「theme 优先于 baseTheme」的机制赢下来。
+   ------------------------------------------------------------------ */
+
+/* ------------------------------------------------------------------
+   预览区排版
+
+   内容来自 innerHTML，没法用工具类逐个挂样式，只能整块写在这里。
+   代码高亮直接复用 --cm-* 那套令牌，编辑区和预览区共用一份配色。
+   ------------------------------------------------------------------ */
+.markdown-body {
+  color: var(--foreground);
+  line-height: 1.75;
+  word-wrap: break-word;
+}
+
+/*
+  阅读宽度上限。
+  「仅预览」布局下正文区会占满整个窗口，一行上百字符根本读不动。
+  这里限制每个顶层块的最大宽度并居中对齐：分栏时本来就窄于 48rem，
+  完全不受影响；只有全宽场景才会看出效果。
+  用 `>` 限定直接子元素 —— 嵌套结构（列表里的段落、引用里的代码块）不该被二次收窄。
+*/
+.markdown-body > * {
+  max-width: 48rem;
+  margin-inline: auto;
+}
+
+.markdown-body > :first-child {
+  margin-top: 0;
+}
+
+.markdown-body > :last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  margin: 1.6em 0 0.6em;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--cm-heading);
+}
+
+.markdown-body h1 {
+  font-size: 1.85em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--border);
+}
+
+.markdown-body h2 {
+  font-size: 1.45em;
+  padding-bottom: 0.25em;
+  border-bottom: 1px solid var(--border);
+}
+
+.markdown-body h3 {
+  font-size: 1.2em;
+}
+
+.markdown-body h4 {
+  font-size: 1.05em;
+}
+
+.markdown-body h5,
+.markdown-body h6 {
+  font-size: 0.95em;
+  color: var(--muted-foreground);
+}
+
+.markdown-body p {
+  margin: 0.85em 0;
+}
+
+.markdown-body a {
+  color: var(--cm-link);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.markdown-body a:hover {
+  text-decoration: underline;
+}
+
+.markdown-body strong {
+  font-weight: 650;
+  color: var(--cm-strong);
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  margin: 0.85em 0;
+  padding-left: 1.7em;
+}
+
+.markdown-body li {
+  margin: 0.3em 0;
+}
+
+.markdown-body li > ul,
+.markdown-body li > ol {
+  margin: 0.3em 0;
+}
+
+/* 任务列表：去掉项目符号，复选框与文字对齐 */
+.markdown-body .contains-task-list {
+  padding-left: 0.4em;
+  list-style: none;
+}
+
+.markdown-body .task-list-item {
+  list-style: none;
+}
+
+.markdown-body .task-list-item-checkbox {
+  margin: 0 0.5em 0 0;
+  vertical-align: middle;
+  accent-color: var(--cm-link);
+}
+
+.markdown-body .task-list-item:has(.task-list-item-checkbox:checked) > p,
+.markdown-body .task-list-item:has(.task-list-item-checkbox:checked) {
+  color: var(--muted-foreground);
+}
+
+.markdown-body blockquote {
+  margin: 0.9em 0;
+  padding: 0.2em 1em;
+  border-left: 3px solid var(--border);
+  color: var(--cm-quote);
+}
+
+.markdown-body blockquote > :first-child {
+  margin-top: 0;
+}
+
+.markdown-body blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body hr {
+  margin: 1.6em 0;
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
+.markdown-body img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+}
+
+.markdown-body table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  margin: 1em 0;
+  overflow: auto;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+
+.markdown-body th,
+.markdown-body td {
+  padding: 0.45em 0.9em;
+  border: 1px solid var(--border);
+}
+
+.markdown-body th {
+  background-color: var(--code-bg);
+  font-weight: 600;
+  text-align: left;
+}
+
+.markdown-body tbody tr:nth-child(2n) {
+  background-color: var(--code-bg);
+}
+
+/* 行内代码 */
+.markdown-body code {
+  padding: 0.15em 0.4em;
+  border-radius: var(--radius-sm);
+  background-color: var(--code-bg);
+  font-family: "Cascadia Mono", "JetBrains Mono", Consolas, "Microsoft YaHei Mono", monospace;
+  font-size: 0.88em;
+  color: var(--cm-code);
+}
+
+/* 代码块 */
+.markdown-body pre.md-code-block {
+  position: relative;
+  margin: 1em 0;
+  padding: 1em 1.1em;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background-color: var(--code-bg);
+  line-height: 1.6;
+}
+
+.markdown-body pre.md-code-block code {
+  padding: 0;
+  background: none;
+  color: var(--foreground);
+  font-size: 0.86em;
+}
+
+/* 语言标签，挂在代码块右上角 */
+.markdown-body pre.md-code-block[data-lang]::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0.15em 0.6em;
+  border-bottom-left-radius: var(--radius-sm);
+  background-color: var(--border);
+  color: var(--muted-foreground);
+  font-family: "Cascadia Mono", Consolas, monospace;
+  font-size: 0.72em;
+  letter-spacing: 0.02em;
+}
+
+/* ------------------------------------------------------------------
+   highlight.js 令牌配色
+   复用编辑区那套 --cm-* 令牌，明暗主题自动跟随
+   ------------------------------------------------------------------ */
+.markdown-body .hljs-comment,
+.markdown-body .hljs-quote {
+  color: var(--cm-comment);
+  font-style: italic;
+}
+
+.markdown-body .hljs-keyword,
+.markdown-body .hljs-selector-tag,
+.markdown-body .hljs-literal,
+.markdown-body .hljs-doctag,
+.markdown-body .hljs-name {
+  color: var(--cm-keyword);
+}
+
+.markdown-body .hljs-string,
+.markdown-body .hljs-regexp,
+.markdown-body .hljs-addition,
+.markdown-body .hljs-template-tag,
+.markdown-body .hljs-selector-attr,
+.markdown-body .hljs-selector-pseudo {
+  color: var(--cm-string);
+}
+
+.markdown-body .hljs-number,
+.markdown-body .hljs-symbol,
+.markdown-body .hljs-bullet,
+.markdown-body .hljs-meta {
+  color: var(--cm-number);
+}
+
+.markdown-body .hljs-literal,
+.markdown-body .hljs-built_in,
+.markdown-body .hljs-type {
+  color: var(--cm-type);
+}
+
+.markdown-body .hljs-title,
+.markdown-body .hljs-title.function_,
+.markdown-body .hljs-section {
+  color: var(--cm-func);
+}
+
+.markdown-body .hljs-attr,
+.markdown-body .hljs-attribute,
+.markdown-body .hljs-variable,
+.markdown-body .hljs-template-variable,
+.markdown-body .hljs-property {
+  color: var(--cm-label);
+}
+
+.markdown-body .hljs-tag,
+.markdown-body .hljs-punctuation,
+.markdown-body .hljs-operator {
+  color: var(--cm-markup);
+}
+
+.markdown-body .hljs-deletion {
+  color: var(--destructive);
+}
+
+.markdown-body .hljs-emphasis {
+  font-style: italic;
+}
+
+.markdown-body .hljs-strong {
+  font-weight: 700;
+}
+
+/* ------------------------------------------------------------------
+   Live Preview（单栏所见即所得）
+
+   装饰器（src/lib/live-preview.ts）只决定「藏什么、给哪一行挂什么 class」，
+   长什么样全在这里 —— 调样式不需要碰装饰逻辑。
+
+   两条约定：
+     - 只作用于 `.cm-editor.cm-live-preview` 之下。源码模式要的是完全原样的编辑区，
+       一个像素都不该被这里影响，所以每条规则都带这个前缀，不做全局兜底。
+     - 颜色一律走 CSS 变量，明暗主题自动跟随，不需要 JS 参与。
+
+   注意这些规则要盖过 CodeMirror 自己的主题：CM 注入的规则带了它生成的类前缀
+   （形如 `.ͼ1 .cm-line`），特异性是 0-2-0，所以下面统一用 0-3-0 起步的选择器。
+   ------------------------------------------------------------------ */
+
+/* 正文居中单栏。宽度上限定在 46rem —— 一行超过这个长度眼睛就跟不上换行了，
+   分栏时代被两栏分摊掉的问题，单栏之后必须显式解决。 */
+.cm-editor.cm-live-preview {
+  font-size: 15px;
+}
+
+.cm-editor.cm-live-preview .cm-content {
+  max-width: 46rem;
+  margin-inline: auto;
+  /* 底部留白让最后一段能滚到屏幕中部，写完不用一直往上看 */
+  padding: 24px 0 30vh;
+}
+
+/* ---- 标题 ---- */
+.cm-live-preview .cm-line.cm-md-h1,
+.cm-live-preview .cm-line.cm-md-h2,
+.cm-live-preview .cm-line.cm-md-h3,
+.cm-live-preview .cm-line.cm-md-h4,
+.cm-live-preview .cm-line.cm-md-h5,
+.cm-live-preview .cm-line.cm-md-h6 {
+  font-weight: 700;
+  color: var(--cm-heading);
+  line-height: 1.35;
+}
+
+.cm-live-preview .cm-line.cm-md-h1 {
+  font-size: 1.85em;
+  padding-top: 0.55em;
+  padding-bottom: 0.25em;
+  border-bottom: 1px solid var(--border);
+}
+
+.cm-live-preview .cm-line.cm-md-h2 {
+  font-size: 1.45em;
+  padding-top: 0.5em;
+  padding-bottom: 0.2em;
+  border-bottom: 1px solid var(--border);
+}
+
+.cm-live-preview .cm-line.cm-md-h3 {
+  font-size: 1.22em;
+  padding-top: 0.4em;
+}
+
+.cm-live-preview .cm-line.cm-md-h4 {
+  font-size: 1.08em;
+  padding-top: 0.3em;
+}
+
+.cm-live-preview .cm-line.cm-md-h5,
+.cm-live-preview .cm-line.cm-md-h6 {
+  font-size: 0.97em;
+  padding-top: 0.25em;
+  color: var(--muted-foreground);
+}
+
+/* ---- 引用 ---- */
+.cm-live-preview .cm-line.cm-md-quote {
+  border-left: 3px solid var(--border);
+  padding-left: 0.9em;
+  color: var(--cm-quote);
+}
+
+/* ---- 围栏代码块 ----
+   首尾行各自补一半圆角，中间行纯底色，拼出一个连续的框。
+   ``` 围栏本身不藏：藏了以后「这行是代码还是正文」就无从判断了。 */
+.cm-live-preview .cm-line.cm-md-codeblock {
+  background-color: var(--code-bg);
+  font-family: "Cascadia Mono", "JetBrains Mono", Consolas, "Microsoft YaHei Mono", monospace;
+  font-size: 0.92em;
+}
+
+.cm-live-preview .cm-line.cm-md-codeblock-first {
+  padding-top: 0.55em;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.cm-live-preview .cm-line.cm-md-codeblock-last {
+  padding-bottom: 0.55em;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+}
+
+.cm-live-preview .cm-line.cm-md-codeblock-single {
+  padding-top: 0.55em;
+  padding-bottom: 0.55em;
+  border-radius: var(--radius-md);
+}
+
+/* ---- 表格 ----
+   只做等宽分区，`|` 保留 —— 表格脱掉竖线就是一串认不出列宽的裸文本。 */
+.cm-live-preview .cm-line.cm-md-table {
+  font-family: "Cascadia Mono", "JetBrains Mono", Consolas, "Microsoft YaHei Mono", monospace;
+  font-size: 0.92em;
+}
+
+.cm-live-preview .cm-line.cm-md-table-head {
+  font-weight: 600;
+  color: var(--cm-heading);
+}
+
+/* 表格分隔行（| --- | --- |）。纯语法噪音，压暗缩小让它退到背景里 ——
+   不藏是因为藏了列宽就无从判断。 */
+.cm-live-preview .cm-line.cm-md-table-delim {
+  color: var(--muted-foreground);
+  opacity: 0.5;
+  font-size: 0.8em;
+}
+
+/* ---- 行内元素 ---- */
+.cm-live-preview .cm-md-inline-code {
+  background-color: var(--code-bg);
+  border-radius: 3px;
+  padding: 0.12em 0.34em;
+  font-family: "Cascadia Mono", "JetBrains Mono", Consolas, "Microsoft YaHei Mono", monospace;
+  color: var(--cm-code);
+}
+
+.cm-live-preview .cm-md-link {
+  color: var(--cm-link);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--cm-link);
+  text-underline-offset: 2px;
+}
+
+/* 项目符号：固定 1ch 宽，让 `-` 和 `•` 切换时后面的文字不左右跳 */
+.cm-live-preview .cm-md-bullet {
+  display: inline-block;
+  width: 1ch;
+  color: var(--cm-markup);
+  text-align: center;
+}
+
+.cm-live-preview .cm-md-task {
+  width: 1em;
+  height: 1em;
+  margin: 0 0.4em 0 0;
+  vertical-align: -0.12em;
+  accent-color: var(--cm-link);
+  cursor: pointer;
+}
+
+.cm-live-preview .cm-md-hr {
+  display: inline-block;
+  width: 100%;
+  border-top: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+/* ---- 图片 ---- */
+.cm-live-preview .cm-md-image {
+  display: inline-block;
+  max-width: 100%;
+  margin: 0.4em 0;
+  vertical-align: top;
+}
+
+.cm-live-preview .cm-md-image img {
+  display: block;
+  max-width: 100%;
+  max-height: 24rem;
+  border-radius: var(--radius-sm);
+}
+
+.cm-live-preview .cm-md-image-broken {
+  display: inline-block;
+  padding: 0.15em 0.6em;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--muted-foreground);
+  font-size: 0.85em;
+}
+
+/* 地址解析不出来时（相对路径 + 文档没落盘）的降级样式 */
+.cm-live-preview .cm-md-image-alt {
+  color: var(--muted-foreground);
+  border-bottom: 1px dashed var(--border);
+}
