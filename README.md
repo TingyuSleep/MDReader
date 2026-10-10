@@ -43,6 +43,23 @@
   导出不改变当前文档，所以**不弹**「放弃未保存改动」确认。
 - 相对路径的图片会被写成相对路径 `src`：把 `.html` 和图片放在一起就能正常显示。
 
+### 打印
+
+- **打印当前文档**：工具栏「打印」按钮（`Ctrl+P` 是尽力而为的别名，见下）。
+- 和导出**共用同一条渲染管线**，但**不共用产物形态**：打印就在本文档里印，
+  应用的样式表本来就挂着，只加一小段 `@media print` 把外壳藏起来、把打印容器露出来 ——
+  一行正文样式都不抄，因此不存在"打印样式和屏幕样式漂移"的可能。
+- **深色主题下也印成浅色**：`.dark` 的令牌挂在 `<html>` 上，所以是把样式表里 `:root`
+  的声明**原样重挂到 `#md-print-root`**，靠 ID 特异性压过 `html.dark`。
+- 装饰到位：`@page` 页边距、标题 `break-after: avoid`、代码块/表格/图片 `break-inside: avoid`、
+  跨页重复表头、`print-color-adjust: exact` 保住代码块底色。
+- 相对路径图片在打印前转成 `asset://`，和实时预览用的是同一个 `resolveAssetImages`。
+
+> ⚠ `Ctrl+P` 有一个**未验证的风险**：本机 Tauri（2.12）没有暴露 WebView2 的
+> `AreBrowserAcceleratorKeysEnabled`，而 wry 默认是**开**的，系统有可能先一步吃掉
+> `Ctrl+P` 去打印原始界面。所以**工具栏按钮才是保证路径**；真要在意这个快捷键，
+> 得走 `with_webview` 拿 `ICoreWebView2Settings3` 关掉浏览器快捷键（尚未实现）。
+
 ### 查找替换
 
 `Ctrl+F` 唤起自研中文面板（不用 CodeMirror 自带的英文面板）：
@@ -152,10 +169,12 @@ src/
 │   ├── live-preview.ts  ★ 所见即所得的核心：三类装饰 + 分派 + 拖选冻结
 │   ├── fs.ts            所有文件操作的唯一出口（含原生对话框）
 │   ├── export-html.ts   导出独立 HTML：拼文档 / 图片补全 / 按选择器提取样式
+│   ├── print.ts         打印：@media print 样式 + 打印容器（不抄正文样式，复用本文档样式表）
 │   ├── status-metrics.ts      字数 / 字符 / 行数的纯函数（规则集中在这里）
 │   ├── cursor.ts        光标位置的极小外部订阅（配合 useSyncExternalStore）
 │   ├── markdown-parse.ts      markdown-it + highlight.js，只允许 Worker 引用
-│   ├── markdown-sanitize.ts   DOMPurify 清洗，主线程唯一入口
+│   ├── markdown-sanitize.ts   DOMPurify 清洗，主线程唯一入口（保持动态加载）
+│   ├── asset-images.ts        data-md-src → asset:// URL（刻意与清洗拆分，否则 DOMPurify 会被拖进主包）
 │   ├── markdown-path.ts       纯字符串路径工具，两侧共用
 │   ├── recent.ts / highlight.ts / utils.ts
 │   └── worker/render.worker.ts
@@ -181,7 +200,8 @@ src-tauri/src/
 
 ## 验收
 
-`dev/` 与 `vite.verify.config.ts` 是 **dev-only**，不进正式构建。六套件共 **282 条**断言：
+`dev/` 与 `vite.verify.config.ts` 是 **dev-only**，不进正式构建。七套件共 **343 条**断言
+（打印套件另有 12 条在 CDP 的打印媒体模拟下跑，合计 **355 条**）：
 
 | 套件 | 条数 | 覆盖 |
 | --- | --- | --- |
@@ -191,6 +211,7 @@ src-tauri/src/
 | `verify-selection.mjs` | 18 | 拖选准确性、选区可见性（真实像素）、层叠顺序、拖选后删除 |
 | `verify-status.html` | 35 | 字数口径逐条、状态栏接线、光标同步、窗口标题 |
 | `verify-export.html` | 53 | 导出文档拼装、图片地址补全、样式提取的取舍、iframe 真渲染 |
+| `verify-print.html` | 61 + 12 | 打印样式逐条、浅色令牌提取、挂载/清理幂等、清洗、`window.print` 时序；**另有打印媒体下的真实版面 + PDF 样例** |
 
 ```bash
 # 1. 构建验证产物并起服务
@@ -203,11 +224,17 @@ node dev/verify-runner.mjs http://127.0.0.1:4173/dev/verify-editor.html
 node dev/verify-runner.mjs http://127.0.0.1:4173/dev/verify-app.html
 node dev/verify-runner.mjs http://127.0.0.1:4173/dev/verify-status.html
 node dev/verify-runner.mjs http://127.0.0.1:4173/dev/verify-export.html
+node dev/verify-runner.mjs http://127.0.0.1:4173/dev/verify-print.html
 node dev/verify-selection.mjs http://127.0.0.1:4173
 
 # 3. Rust 侧单测
 cd src-tauri && cargo test --release
 ```
+
+`verify-print.html` 会额外触发运行器的**打印媒体探针**：页面自己改不了媒体类型，
+所以由运行器先 `Emulation.setEmulatedMedia({media:"print"})`、再调页面的
+`__printMediaProbe()` 量真实版面，最后 `Page.printToPDF` 把版面存成
+`docs/samples/打印样例.pdf`（3 页）。其它套件不导出探针，完全不受影响。
 
 另有 `Rust 单测` 覆盖启动参数解析（`cargo test --release`，13 条）。
 截图：`node dev/screenshot.mjs http://127.0.0.1:4173 docs/screenshots`
@@ -230,6 +257,13 @@ cd src-tauri && cargo test --release
 - **「字符串里有这行 CSS」不等于「这行 CSS 有用」**：选择器写错、变量没定义、
   被后面的规则覆盖，字符串断言全都是绿的。导出这类产物要**塞进 iframe 真渲染一遍**
   再读 `getComputedStyle`（srcdoc 被当作同源，dev 的 CSP 放行内联样式）。
+- **`@media print` 里的规则，页面内一行都验不到** —— 页面改不了自己的媒体类型。
+  要么由运行器用 CDP `Emulation.setEmulatedMedia({media:"print"})` 切过去再量，
+  要么就只能停在"字符串里有这条规则"这种弱断言上。打印本套件选前者。
+- **断言要写你真正在意的性质，别写"某个元素等于某个令牌"**。打印套件里
+  「h1 的颜色等于浅色 `--foreground`」直接红了 —— 标题的配色走的是 `--cm-heading`，
+  根本不经过 `--foreground`。改成「深色主题下量一遍、浅色主题下再量一遍，两边必须相等」
+  之后，对标题/正文/代码块一视同仁，也不怕将来谁换了令牌。
 
 ---
 
@@ -237,7 +271,7 @@ cd src-tauri && cargo test --release
 
 | 类别 | 缺什么 |
 | --- | --- |
-| 导出 | 导出 PDF、打印 |
+| 导出 | 导出 PDF（打印已有，但**不能存成 PDF 文件**） |
 | 编辑增强 | **编辑区实时预览里的代码块没有语法高亮**（highlight.js 只接在渲染管线里）、表格可视化编辑、图片粘贴上传 |
 | 交互 | 实时预览模式下链接**点击不跳转**（只上色，需切源码模式或走渲染管线） |
 | 规模 | 多标签页、文件树 / 侧栏、大纲（`toc` 已在渲染管线里产出，差 UI）、命令面板、跨文件全文搜索 |
@@ -308,3 +342,12 @@ cd src-tauri && cargo test --release
   但要记住：**端口得等浏览器进程活过 3 秒**才连得上 —— 被 GPU FATAL 干掉时是连不上的。
 - Chromium 自身的错误日志落在 `%LOCALAPPDATA%\com.tingyumian.mdreader\EBWebView\chrome_debug.log`，
   排查「白屏」先看它，比猜快得多。
+- **WebView2 的「浏览器快捷键」默认是开着的，而且 Tauri 没有暴露开关**（2026-10 查证）：
+  在 `tauri-utils-2.10.1/src/config.rs` 与 `tauri-2.12.2/src/webview/mod.rs` 里 grep
+  `accelerator` 只找到一句菜单相关的注释；`tauri-runtime-wry-2.12.1` 也**完全没有**设置
+  这个属性，于是落到 wry 0.57.0 `lib.rs:1768` 的默认值 `browser_accelerator_keys: true`。
+  后果是 `Ctrl+P` / `Ctrl+F` / `Ctrl+R` / `F5` / `F11` 有可能被系统先一步处理掉，
+  页面里的 `keydown` 根本收不到。要关掉只能自己 `with_webview` 拿
+  `ICoreWebView2Controller → CoreWebView2 → Settings → ICoreWebView2Settings3`，
+  调 `SetAreBrowserAcceleratorKeysEnabled(FALSE)`（**尚未实现**）。
+  当前策略：功能一律保证有**工具栏按钮**这条不依赖快捷键的路径。
