@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MD阅读器</title>
+    <!--
+      首屏主题：必须在样式表之前同步执行，否则深色用户会看到一帧白屏。
+      CSP 的 script-src 只有 'self'，内联脚本会被拦，所以只能走同源外链。
+    -->
+    <script src="/theme-init.js"></script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

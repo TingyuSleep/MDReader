@@ -1,0 +1,10 @@
+# pnpm 项目配置（pnpm 10+ 的非认证类设置统一放这里，.npmrc 只留 registry）
+#
+# 本机（Windows）适配说明：
+#   pnpm 默认的 isolated 链接器依赖符号链接，在启用供应链安全策略的环境下
+#   会被静默拦截（不报错，但一个链接都不建）。改用 hoisted 模式
+#   （真实目录，不用软链），行为等价于 npm 的扁平安装。
+nodeLinker: hoisted
+
+minimumReleaseAgeExclude:
+  - lucide-react@1.54.0

@@ -1,0 +1,59 @@
+[package]
+name = "md-reader"
+version = "0.1.0"
+description = "MD阅读器 — 面向 Windows 的本地优先 Markdown 编辑器"
+authors = ["听雨眠"]
+edition = "2024"
+rust-version = "1.90"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+# The `_lib` suffix may seem redundant but it is necessary
+# to make the lib name unique and wouldn't conflict with the bin name.
+# This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
+name = "md_reader_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+# 上游兼容补丁：indexmap 1.9.3 没有 default 特性，std 依赖 build.rs 里的
+# autocfg 探测（has_std）。探测一旦失败，IndexMap 就少了默认泛型参数 S，
+# 导致 schemars 0.8 的 `Map<K,V> = indexmap::IndexMap<K,V>` 编译不过。
+# 显式打开 std 可直接跳过探测。schemars 同时挂在普通依赖与构建依赖两侧，
+# 而 resolver v2+ 不跨 dep-kind 统一特性，所以两处都要显式声明。
+indexmap = { version = "1.9.3", features = ["std"] }
+
+[dependencies]
+# protocol-asset: 让 convertFileSrc 生成的 asset:// 能加载本地图片（见图片加载策略）
+tauri = { version = "2", features = ["protocol-asset"] }
+# single-instance: 文件关联的前提。没有它，双击第二个 .md 会开出第二个窗口，
+#                  两个窗口各改各的，最后互相覆盖。
+tauri-plugin-single-instance = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-opener = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# 同上：构建依赖侧也要固定 indexmap 的 std 特性
+indexmap = { version = "1.9.3", features = ["std"] }
+
+[features]
+# ⚠ 这一段不能删。Tauri v2 靠它区分开发/生产：
+#     tauri-macros/src/context.rs:  dev: cfg!(not(feature = "custom-protocol"))
+#   feature 开着 → dev=false → generate_context! 把 frontendDist 里的前端资源**内嵌进 exe**；
+#   feature 没开 → dev=true  → 运行时去连 devUrl（http://localhost:1420），
+#                             没有 dev server 就是「localhost 拒绝连接」。
+#   `tauri build` 会自动带上这个 feature，直接 `cargo build --release` 不会，所以必须显式声明。
+custom-protocol = ["tauri/custom-protocol"]
+
+
+# Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration
+[profile.release]
+codegen-units = 1
+lto = true
+# 桌面应用优先压体积，用 "s"（Tauri 官方建议）而非默认的 3
+opt-level = "s"
+panic = "abort"
+strip = true
