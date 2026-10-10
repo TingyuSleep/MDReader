@@ -34,6 +34,7 @@ export default defineConfig(
           "verify-app": fileURLToPath(new URL("./dev/verify-app.html", import.meta.url)),
           "verify-status": fileURLToPath(new URL("./dev/verify-status.html", import.meta.url)),
           "verify-export": fileURLToPath(new URL("./dev/verify-export.html", import.meta.url)),
+          "verify-print": fileURLToPath(new URL("./dev/verify-print.html", import.meta.url)),
           "preview-shell": fileURLToPath(new URL("./dev/preview-shell.html", import.meta.url)),
         },
       },

@@ -11,7 +11,7 @@
  * 加 --virtual-time-budget 又会把 performance.now() 变成虚拟时钟，性能数字就没意义了。
  */
 import { spawn } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -165,13 +165,95 @@ async function main() {
     console.log("=========================================");
     console.log(`[runner] title = ${title}`);
 
+    /*
+      ---- 打印套件专用：打印媒体探针 + 真实 PDF
+
+      页面自己改不了媒体类型（`Emulation.setEmulatedMedia` 是 CDP 域的能力），
+      所以"打印媒体下外壳到底有没有被藏住、正文是不是真的排上了版"这层
+      只能由这里配合验。页面检测到就做，其它套件完全不受影响。
+
+      顺带把打印媒体下的版面抓成 PDF 存进 docs/samples/ —— 断言只能证明"符合预期"，
+      证明不了"看起来对"，这两件事互补，和导出那套（make-sample-export.mjs）一个道理。
+    */
+    const extraLines = [];
+    let extraFail = 0;
+    const linesBeforeProbe = typeof output === "string" ? output.split("\n").length : 0;
+
+    const hasProbe = await evaluate("typeof window.__printMediaProbe === 'function'");
+    if (hasProbe === true) {
+      console.log("[runner] 检测到打印媒体探针，切到 print 媒体再跑一轮");
+
+      await send("Emulation.setEmulatedMedia", { media: "print" });
+      const probed = await evaluate("window.__printMediaProbe()");
+
+      if (Array.isArray(probed)) {
+        probed.forEach((item, index) => {
+          if (!item.pass) extraFail += 1;
+          extraLines.push(
+            `${item.pass ? "PASS" : "FAIL"} P${String(index + 1).padStart(2, "0")} ${item.name}${item.info ? ` | ${item.info}` : ""}`,
+          );
+        });
+      } else {
+        extraFail += 1;
+        extraLines.push(`FAIL P?? 打印媒体探针没有返回结果 | ${JSON.stringify(probed)}`);
+      }
+
+      // 抓一份真实 PDF。纸张与页边距在这里再传一遍：CDP 的参数会盖掉 CSS 的 @page，
+      // 之所以还在 CSS 里保留 @page，是为了护住 WebView2 里那条交互打印路径。
+      await send("Page.enable");
+      const pdfReply = await send("Page.printToPDF", {
+        printBackground: true,
+        paperWidth: 8.27,
+        paperHeight: 11.69,
+        marginTop: 0.63,
+        marginBottom: 0.63,
+        marginLeft: 0.59,
+        marginRight: 0.59,
+      });
+
+      const base64 = pdfReply?.result?.data;
+      if (typeof base64 === "string" && base64.length > 0) {
+        const buffer = Buffer.from(base64, "base64");
+        const pdfPath = join(process.cwd(), "docs", "samples", "打印样例.pdf");
+        mkdirSync(join(process.cwd(), "docs", "samples"), { recursive: true });
+        writeFileSync(pdfPath, buffer);
+
+        // 页数从 PDF 对象里数：/Type /Page（不能把 /Type /Pages 也算进去）
+        const pageCount = (buffer.toString("latin1").match(/\/Type\s*\/Page[^s]/g) ?? []).length;
+        const checks = [
+          ["产出的 PDF 是合法 PDF（%PDF- 头）", buffer.subarray(0, 5).toString("latin1") === "%PDF-", buffer.subarray(0, 8).toString("latin1")],
+          ["PDF 有内容（> 8 KB，不是空白页）", buffer.length > 8192, `${(buffer.length / 1024).toFixed(1)} KB`],
+          ["PDF 至少两页（样例够长，分页规则才有意义）", pageCount >= 2, `${pageCount} 页`],
+        ];
+        for (const [name, pass, info] of checks) {
+          if (!pass) extraFail += 1;
+          extraLines.push(`${pass ? "PASS" : "FAIL"} P${String(extraLines.length + 1).padStart(2, "0")} ${name}${info ? ` | ${info}` : ""}`);
+        }
+        console.log(`[runner] 打印样例已落盘 ${pdfPath}（${(buffer.length / 1024).toFixed(1)} KB，${pageCount} 页）`);
+      } else {
+        extraFail += 1;
+        extraLines.push("FAIL P?? Page.printToPDF 没有返回数据");
+      }
+
+      await send("Emulation.setEmulatedMedia", { media: "" });
+      const cleaned = await evaluate("window.__printMediaCleanup()");
+      const cleanPass = cleaned === true;
+      if (!cleanPass) extraFail += 1;
+      extraLines.push(`${cleanPass ? "PASS" : "FAIL"} P${String(extraLines.length + 1).padStart(2, "0")} 探针的打印容器已清理`);
+
+      console.log("\n---------- 打印媒体探针（CDP Emulation） ----------");
+      for (const line of extraLines) console.log(line);
+      console.log(`---------- 探针小结：${extraLines.length - extraFail} 通过 / ${extraFail} 失败 ----------`);
+      console.log(`[runner] 页面内 ${linesBeforeProbe} 行 + 探针 ${extraLines.length} 行`);
+    }
+
     if (pageLog.length > 0) {
       console.log("\n---------------- 页面日志 ----------------");
       for (const line of pageLog.slice(-40)) console.log(line);
       console.log("-----------------------------------------");
     }
 
-    exitCode = typeof title === "string" && title.startsWith("ALL_PASS") ? 0 : 1;
+    exitCode = typeof title === "string" && title.startsWith("ALL_PASS") && extraFail === 0 ? 0 : 1;
     ws.close();
   } catch (err) {
     console.error("[runner] 失败：", err.message);
