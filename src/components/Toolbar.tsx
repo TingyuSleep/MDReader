@@ -10,7 +10,7 @@
  *     假装什么都没发生。
  */
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { isTauri } from "@tauri-apps/api/core";
 import {
@@ -21,6 +21,7 @@ import {
   Monitor,
   Moon,
   Pencil,
+  Printer,
   Save,
   SaveAll,
   Sun,
@@ -30,7 +31,8 @@ import {
 import { cycleThemeMode, useResolvedTheme, useThemeMode, type ThemeMode } from "@/hooks/useTheme";
 import { cn, formatBytes } from "@/lib/utils";
 import { exportHtmlFile } from "@/lib/export-html";
-import { confirmDiscardIfDirty, fileName, pickMarkdownFile, pickSavePath } from "@/lib/fs";
+import { confirmDiscardIfDirty, dirName, fileName, pickMarkdownFile, pickSavePath } from "@/lib/fs";
+import { printDocument, REQUEST_PRINT_EVENT } from "@/lib/print";
 import { useEditor, useIsDirty, type ViewMode } from "@/store/editor";
 
 // ------------------------------------------------------------ 小构件
@@ -123,6 +125,10 @@ export function Toolbar() {
   */
   const [exporting, setExporting] = useState(false);
 
+  // 同上：打印也只有工具栏这一个实现，Ctrl+P 是发事件过来复用这里的逻辑，
+  // 所以状态留在本地即可。Ctrl+F 也是同一套做法（见 Editor 的 TOGGLE_FIND_EVENT）。
+  const [printing, setPrinting] = useState(false);
+
   const ThemeIcon = THEME_META[themeMode].icon;
 
   async function handleOpen(): Promise<void> {
@@ -212,7 +218,53 @@ export function Toolbar() {
     }
   }
 
-  /** 新建 / 关闭共用：都是「离开当前文档」，都要过同一道丢弃确认 */  async function leaveCurrent(action: string, then: () => void): Promise<void> {
+  /**
+   * 打印当前文档。
+   *
+   * 和导出一样**不过丢弃确认** —— 打印不改变当前文档，也不离开它。
+   * 文档有未保存改动时打印的正是屏幕上这一版，这是对的。
+   *
+   * 成功后**刻意不弹提示**：`window.print()` 返回时用户已经操作完系统打印对话框了，
+   * 这时再冒一句"已打开打印对话框"既迟到又没信息量；而"是否真的打了"我们无从得知，
+   * 编一句"打印完成"就是撒谎。
+   */
+  async function handlePrint(): Promise<void> {
+    if (!content) {
+      setNotice("当前文档是空的，没有可打印的内容");
+      return;
+    }
+    setPrinting(true);
+    try {
+      await printDocument({
+        markdown: content,
+        baseDir: path ? dirName(path) : undefined,
+      });
+    } catch (err) {
+      setError({
+        code: "UNKNOWN",
+        message: "打印失败",
+        detail: err instanceof Error ? err.message : String(err),
+      });
+    } finally {
+      setPrinting(false);
+    }
+  }
+
+  /**
+   * Ctrl+P 由 App 的全局快捷键转发过来，避免打印逻辑写两份。
+   *
+   * 不把 `handlePrint` 提成 useCallback：它闭包了 content / path，
+   * 而这两个正是这里需要重新订阅的原因，写成依赖更直白。
+   */
+  useEffect(() => {
+    const onRequest = (): void => void handlePrint();
+    window.addEventListener(REQUEST_PRINT_EVENT, onRequest);
+    return () => window.removeEventListener(REQUEST_PRINT_EVENT, onRequest);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- setNotice/setError/setPrinting 是稳定引用
+  }, [content, path]);
+
+  /** 新建 / 关闭共用：都是「离开当前文档」，都要过同一道丢弃确认 */
+  async function leaveCurrent(action: string, then: () => void): Promise<void> {
     try {
       const decision = await confirmDiscardIfDirty(dirty, action);
       if (decision === "cancel") return;
@@ -280,6 +332,15 @@ export function Toolbar() {
         onClick={() => void handleExportHtml()}
       >
         <FileDown className="size-4" />
+      </ToolButton>
+      <ToolButton
+        label={printing ? "打印中…" : "打印"}
+        shortcut="Ctrl+P"
+        description="打印当前文档"
+        disabled={printing || content.length === 0}
+        onClick={() => void handlePrint()}
+      >
+        <Printer className="size-4" />
       </ToolButton>
       <ToolButton
         label="关闭文档"

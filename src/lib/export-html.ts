@@ -166,6 +166,44 @@ export function pickExportCss(doc: Document = document): string {
   return out.join("\n");
 }
 
+/**
+ * 取出样式表里 `:root` 那条规则的声明文本（浅色令牌）。
+ *
+ * 打印要用：`.dark` 的令牌挂在 `<html>` 上，光把打印容器的底色调白是没用的 ——
+ * `.dark{...}` 那条规则依然生效。把 `:root` 的声明**原样**重挂到打印容器的 ID
+ * 选择器上，靠特异性（1-0-0 > 0-1-0）压过 `html.dark`，才能保证深色主题下也印成浅色。
+ *
+ * 为什么要"原样搬"而不是在 TS 里重新写一份浅色值：同 pickExportCss 的理由 ——
+ * 手写一份必然和 index.css 里的令牌慢慢漂移，而"漂移了但没人发现"正是这类代码的常态。
+ *
+ * 只认选择器**恰好等于** `:root` 的规则。`.dark` 也是顶层规则、也带 `--preview-bg`，
+ * 按"含某个令牌名"来筛会把它一起收进来，那打印就又变回深色了。
+ */
+export function pickLightTokenDeclarations(doc: Document = document): string {
+  const out: string[] = [];
+
+  const visit = (rules: CSSRuleList): void => {
+    for (const rule of Array.from(rules)) {
+      const styleRule = rule as CSSStyleRule;
+      if (typeof styleRule.selectorText === "string") {
+        if (styleRule.selectorText === ":root") out.push(styleRule.style.cssText);
+        continue;
+      }
+      const nested = (rule as CSSGroupingRule).cssRules;
+      if (nested && nested.length > 0) visit(nested);
+    }
+  };
+
+  for (const sheet of Array.from(doc.styleSheets)) {
+    try {
+      visit(sheet.cssRules);
+    } catch {
+      // 跨域样式表：读 cssRules 会抛 SecurityError，跳过
+    }
+  }
+  return out.join("\n");
+}
+
 // ------------------------------------------------------------ 正文准备
 
 /**

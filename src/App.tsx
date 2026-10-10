@@ -34,6 +34,7 @@ import {
   pickSavePath,
 } from "@/lib/fs";
 import { cn } from "@/lib/utils";
+import { REQUEST_PRINT_EVENT } from "@/lib/print";
 import { useEditor, useIsDirty } from "@/store/editor";
 
 /**
@@ -262,6 +263,18 @@ export default function App() {
           // （焦点在工具栏按钮、欢迎页按钮上时按 Ctrl+/ 也该管用）。
           event.preventDefault();
           setViewMode(viewMode === "source" ? "live" : "source");
+          break;
+        case "p":
+          /*
+            打印。只做转发，不在这里实现 —— 打印的容器与样式表在 lib/print，
+            入口和 loading 态在工具栏，这里再写一份必然和那边不一致。
+
+            ⚠ 本机 Tauri（2.12）没有暴露 WebView2 的 AreBrowserAcceleratorKeysEnabled，
+            wry 默认开着浏览器快捷键，所以**系统有可能先一步吃掉 Ctrl+P**，
+            那样这段代码根本不会执行。工具栏的「打印」按钮才是保证路径。
+          */
+          event.preventDefault();
+          window.dispatchEvent(new Event(REQUEST_PRINT_EVENT));
           break;
         default:
           break;
