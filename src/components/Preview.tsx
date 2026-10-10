@@ -22,7 +22,7 @@ import { useCallback, useEffect, useRef, type MouseEvent } from "react";
 import { openUrl } from "@tauri-apps/plugin-opener";
 
 import { dirName } from "@/lib/fs";
-import { resolveAssetImages } from "@/lib/markdown-sanitize";
+import { resolveAssetImages } from "@/lib/asset-images";
 import { formatBytes } from "@/lib/utils";
 import { useEditor } from "@/store/editor";
 

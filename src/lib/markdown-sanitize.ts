@@ -1,21 +1,19 @@
 /**
- * 渲染管线 · 第二、三段：清洗 + 图片地址重写。**必须在主线程执行**。
+ * 渲染管线 · 第二段：清洗。**必须在主线程执行**。
  *
  * 这个模块是主线程在渲染链路上唯一的依赖，刻意只带 DOMPurify（约 47 KB）。
  * 解析器（markdown-it + highlight.js，约 217 KB）在 markdown-parse.ts 里，
  * 只有 Worker 会引 —— 别在这里 import 它。
  *
- * 两段都必须有 DOM / window：
- *   - DOMPurify 在 Worker 里 isSupported=false，起不到任何防护作用；
- *   - convertFileSrc 依赖 window.__TAURI_INTERNALS__。
+ * 第三段「图片地址重写」**已经搬去 asset-images.ts**：它和 DOMPurify 毫无关系，
+ * 留在本模块里会让任何 import 它的人顺手把 DOMPurify 拖进首屏主包（打印踩过一次）。
+ * 本模块也不要 import 它，否则又会绕回来。
+ *
+ * 必须有 DOM / window：DOMPurify 在 Worker 里 isSupported=false，起不到任何防护作用。
  *
  * 调用顺序固定为：parse（Worker）→ sanitize（主线程）→ 塞进 DOM → resolveAssetImages（主线程）
  */
 import DOMPurify, { type Config } from "dompurify";
-import { isTauri } from "@tauri-apps/api/core";
-
-import { toAssetUrl } from "./fs";
-import { resolveRelativePath } from "./markdown-path";
 
 /** 允许保留的属性白名单 */
 const SANITIZE_CONFIG: Config = {
@@ -40,38 +38,4 @@ export function sanitizeHtml(dirty: string): string {
     throw new Error("DOMPurify 不可用：HTML 清洗必须在有 DOM 的主线程执行，不能放进 Web Worker");
   }
   return DOMPurify.sanitize(dirty, SANITIZE_CONFIG);
-}
-
-/**
- * 把 data-md-src 的相对路径解析成 asset:// URL 并写回 src。
- *
- * 必须在 innerHTML 之后再调用。返回修正的图片数量，便于测试与排查。
- */
-export function resolveAssetImages(root: ParentNode, baseDir: string): number {
-  const images = root.querySelectorAll<HTMLImageElement>("img[data-md-src]");
-  let fixed = 0;
-
-  for (const img of images) {
-    const raw = img.getAttribute("data-md-src");
-    if (!raw) continue;
-
-    const absolute = resolveRelativePath(baseDir, raw);
-    img.removeAttribute("data-md-src");
-
-    if (!isTauri()) {
-      // 纯浏览器里跑 dev server 的降级路径：asset 协议不存在，退回相对路径碰运气
-      img.setAttribute("src", raw);
-      fixed += 1;
-      continue;
-    }
-
-    try {
-      img.setAttribute("src", toAssetUrl(absolute));
-      fixed += 1;
-    } catch (err) {
-      console.warn("[markdown] 图片地址转换失败", absolute, err);
-    }
-  }
-
-  return fixed;
 }

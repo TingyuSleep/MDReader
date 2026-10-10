@@ -6,7 +6,8 @@
  */
 import { parseMarkdown } from "@/lib/markdown-parse";
 import { resolveRelativePath } from "@/lib/markdown-path";
-import { resolveAssetImages, sanitizeHtml } from "@/lib/markdown-sanitize";
+import { resolveAssetImages } from "@/lib/asset-images";
+import { sanitizeHtml } from "@/lib/markdown-sanitize";
 import type { RenderRequest, RenderResponse } from "@/lib/worker/render.worker";
 
 interface Result {

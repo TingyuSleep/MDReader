@@ -8,7 +8,7 @@
  *   1. **不做清洗**。DOMPurify 在 Worker 里 isSupported=false，完全没有防护能力，
  *      清洗必须回主线程做。见 markdown-sanitize.ts 的 sanitizeHtml()。
  *   2. **不做图片地址转换**。convertFileSrc 依赖 window.__TAURI_INTERNALS__，
- *      Worker 里没有 window。见 markdown-sanitize.ts 的 resolveAssetImages()。
+ *      Worker 里没有 window。见 asset-images.ts 的 resolveAssetImages()。
  *
  * 线程模型：请求方给每条消息一个自增 id，Worker 原样回传。Worker 不判断新旧 ——
  * 它按收到顺序串行处理，**丢弃过期结果由调用方按 id 决定**。这样 Worker 保持纯函数语义。
