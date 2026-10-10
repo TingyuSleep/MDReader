@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="MD阅读器">
+<title>导出样例</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{color-scheme:light}
+html.dark{color-scheme:dark}
+body{margin:0;padding:3rem 1.25rem 6rem;background:var(--preview-bg,#fff);color:var(--foreground,#161616);
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC","Hiragino Sans GB",sans-serif;
+-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.export-page{max-width:52rem;margin:0 auto}
+.export-meta{margin:0 0 2rem;padding-bottom:1rem;border-bottom:1px solid var(--border,#e5e5e5);
+font-size:.75rem;color:var(--muted-foreground,#777)}
+@media print{body{padding:0;background:#fff;color:#000}.export-page{max-width:none}.export-meta{display:none}}
+</style>
+<style>
+@layer theme{
+:root, :host { --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; --spacing: .25rem; --container-xl: 36rem; --container-2xl: 42rem; --text-xs: .75rem; --text-xs--line-height: calc(1 / .75); --text-sm: .875rem; --text-sm--line-height: calc(1.25 / .875); --text-2xl: 1.5rem; --text-2xl--line-height: calc(2 / 1.5); --font-weight-medium: 500; --font-weight-semibold: 600; --tracking-tight: -.025em; --tracking-wide: .025em; --radius-sm: calc(var(--radius) - 4px); --radius-md: calc(var(--radius) - 2px); --default-transition-duration: .15s; --default-transition-timing-function: cubic-bezier(.4, 0, .2, 1); --default-font-family: var(--font-sans); --default-mono-font-family: var(--font-mono); --color-background: var(--background); --color-foreground: var(--foreground); --color-border: var(--border); }
+}
+@layer base{
+html, :host { text-size-adjust: 100%; tab-size: 4; line-height: 1.5; font-family: var(--default-font-family,-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"); font-feature-settings: var(--default-font-feature-settings,normal); font-variation-settings: var(--default-font-variation-settings,normal); -webkit-tap-highlight-color: transparent; }
+}
+:root { --radius: .5rem; --background: #fdfdfd; --foreground: #0d0d0d; --card: #fff; --card-foreground: #0d0d0d; --popover: #fff; --popover-foreground: #0d0d0d; --primary: #1f1f1f; --primary-foreground: #fafafa; --secondary: #f5f5f5; --secondary-foreground: #1f1f1f; --muted: #f5f5f5; --muted-foreground: #737373; --accent: #f2f2f2; --accent-foreground: #1f1f1f; --destructive: #e40014; --destructive-foreground: #fafafa; --border: #e4e4e4; --input: #e4e4e4; --ring: #868686; --toolbar-bg: #fafafa; --editor-bg: #fff; --preview-bg: #fff; --code-bg: #f5f5f5; --scrollbar-thumb: #cecece; --cm-selection-bg: #2389e273; --cm-selection-bg-dim: #2389e242; --cm-heading: #21459d; --cm-strong: #121212; --cm-link: #0070a6; --cm-url: #00797e; --cm-code: #9d3343; --cm-quote: #45674c; --cm-markup: #868686; --cm-sep: #7a7a7a; --cm-label: #714ca6; --cm-comment: gray; --cm-keyword: #8632b6; --cm-string: #00682c; --cm-number: #a93800; --cm-bool: #a93800; --cm-type: #00617a; --cm-func: #364ba7; }
+@supports (color:lab(0% 0 0)){
+:root { --background: lab(99.42% -.0000596046 0); --foreground: lab(3.6999% 0 0); --card: lab(100% 0 0); --card-foreground: lab(3.6999% 0 0); --popover: lab(100% 0 0); --popover-foreground: lab(3.6999% 0 0); --primary: lab(11.84% .0000149012 0); --primary-foreground: lab(98.26% 0 0); --secondary: lab(96.52% -.0000596046 0); --secondary-foreground: lab(11.84% .0000149012 0); --muted: lab(96.52% -.0000596046 0); --muted-foreground: lab(48.496% 0 0); --accent: lab(95.36% .0000596046 0); --accent-foreground: lab(11.84% .0000149012 0); --destructive: lab(48.4493% 77.4328 61.5452); --destructive-foreground: lab(98.26% 0 0); --border: lab(90.488% 0 0); --input: lab(90.488% 0 0); --ring: lab(55.92% 0 0); --toolbar-bg: lab(98.26% 0 0); --editor-bg: lab(100% 0 0); --preview-bg: lab(100% 0 0); --code-bg: lab(96.52% -.0000596046 0); --scrollbar-thumb: lab(82.6% 0 0); --cm-selection-bg: lab(55.1124% -4.33156 -53.7148/.45); --cm-selection-bg-dim: lab(55.1124% -4.33156 -53.7148/.26); --cm-heading: lab(31.0281% 13.4718 -52.8738); --cm-strong: lab(5.26802% 0 0); --cm-link: lab(43.8829% -11.3778 -49.3298); --cm-url: lab(45.2814% -31.2188 -12.7895); --cm-code: lab(38.1278% 45.3516 15.5851); --cm-quote: lab(40.4592% -17.8981 11.5693); --cm-markup: lab(55.92% 0 0); --cm-sep: lab(51.28% 0 0); --cm-label: lab(39.8846% 30.373 -43.3873); --cm-comment: lab(53.6% 0 0); --cm-keyword: lab(38.5645% 51.7889 -54.5957); --cm-string: lab(37.8054% -39.6346 26.5962); --cm-number: lab(40.678% 46.4402 54.8349); --cm-bool: lab(40.678% 46.4402 54.8349); --cm-type: lab(36.7291% -26.5041 -30.0649); --cm-func: lab(34.3746% 16.6938 -53.2444); }
+}
+.dark { --background: #0e0e0e; --foreground: #f2f2f2; --card: #171717; --card-foreground: #f2f2f2; --popover: #171717; --popover-foreground: #f2f2f2; --primary: #e4e4e4; --primary-foreground: #171717; --secondary: #242424; --secondary-foreground: #f2f2f2; --muted: #242424; --muted-foreground: #9e9e9e; --accent: #2b2b2b; --accent-foreground: #f2f2f2; --destructive: #ed5350; --destructive-foreground: #f2f2f2; --border: #ffffff1f; --input: #ffffff29; --ring: #717171; --toolbar-bg: #151515; --editor-bg: #131313; --preview-bg: #0e0e0e; --code-bg: #1e1e1e; --scrollbar-thumb: #424242; --cm-selection-bg: #59aaf861; --cm-selection-bg-dim: #59aaf838; --cm-heading: #9bbdff; --cm-strong: #f5f5f5; --cm-link: #69c1fc; --cm-url: #64c3c8; --cm-code: #fca0a7; --cm-quote: #98c5a0; --cm-markup: #7a7a7a; --cm-sep: #868686; --cm-label: #c8aefa; --cm-comment: #868686; --cm-keyword: #dcaeff; --cm-string: #89da9b; --cm-number: #ffb093; --cm-bool: #ffb093; --cm-type: #6ccdea; --cm-func: #acc2ff; }
+@supports (color:lab(0% 0 0)){
+.dark { --background: lab(4.05772% 0 0); --foreground: lab(95.36% .0000596046 0); --card: lab(7.78201% -.0000149012 0); --card-foreground: lab(95.36% .0000596046 0); --popover: lab(7.78201% -.0000149012 0); --popover-foreground: lab(95.36% .0000596046 0); --primary: lab(90.72% .0000298023 -.0000119209); --primary-foreground: lab(7.78201% -.0000149012 0); --secondary: lab(14.16% 0 0); --secondary-foreground: lab(95.36% .0000596046 0); --muted: lab(14.16% 0 0); --muted-foreground: lab(65.2% 0 0); --accent: lab(17.64% 0 0); --accent-foreground: lab(95.36% .0000596046 0); --destructive: lab(57.5028% 59.8954 35.7154); --destructive-foreground: lab(95.36% .0000596046 0); --border: lab(100% 0 0/.12); --input: lab(100% 0 0/.16); --ring: lab(47.8% 0 .0000119209); --toolbar-bg: lab(6.69783% 0 0); --editor-bg: lab(5.71933% 0 0); --preview-bg: lab(4.05772% 0 0); --code-bg: lab(11.26% 0 -.00000596046); --scrollbar-thumb: lab(28.08% 0 0); --cm-selection-bg: lab(66.978% -7.00611 -47.4265/.38); --cm-selection-bg-dim: lab(66.978% -7.00611 -47.4265/.22); --cm-heading: lab(75.9968% 1.92803 -43.3046); --cm-strong: lab(96.52% -.0000596046 0); --cm-link: lab(74.4342% -14.7357 -37.8577); --cm-url: lab(73.0384% -28.2801 -11.6703); --cm-code: lab(75.5993% 35.7471 11.5937); --cm-quote: lab(75.3994% -20.8079 13.3758); --cm-markup: lab(51.28% 0 0); --cm-sep: lab(55.92% 0 0); --cm-label: lab(75.3929% 21.3337 -34.7458); --cm-comment: lab(55.92% 0 0); --cm-keyword: lab(77.3143% 30.5541 -36.2737); --cm-string: lab(80.6679% -35.8792 23.2774); --cm-number: lab(79.4181% 32.9401 31.9476); --cm-bool: lab(79.4181% 32.9401 31.9476); --cm-type: lab(77.3325% -23.7112 -23.8123); --cm-func: lab(78.2661% 4.91107 -40.0393); }
+}
+.markdown-body { color: var(--foreground); overflow-wrap: break-word; line-height: 1.75; }
+.markdown-body > * { max-width: 48rem; margin-inline: auto; }
+.markdown-body > :first-child { margin-top: 0px; }
+.markdown-body > :last-child { margin-bottom: 0px; }
+.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4, .markdown-body h5, .markdown-body h6 { color: var(--cm-heading); margin: 1.6em 0px 0.6em; font-weight: 600; line-height: 1.35; }
+.markdown-body h1 { border-bottom: 1px solid var(--border); padding-bottom: 0.3em; font-size: 1.85em; }
+.markdown-body h2 { border-bottom: 1px solid var(--border); padding-bottom: 0.25em; font-size: 1.45em; }
+.markdown-body h3 { font-size: 1.2em; }
+.markdown-body h4 { font-size: 1.05em; }
+.markdown-body h5, .markdown-body h6 { color: var(--muted-foreground); font-size: 0.95em; }
+.markdown-body p { margin: 0.85em 0px; }
+.markdown-body a { color: var(--cm-link); cursor: pointer; text-decoration: none; }
+.markdown-body a:hover { text-decoration: underline; }
+.markdown-body strong { color: var(--cm-strong); font-weight: 650; }
+.markdown-body ul, .markdown-body ol { margin: 0.85em 0px; padding-left: 1.7em; }
+.markdown-body li, .markdown-body li > ul, .markdown-body li > ol { margin: 0.3em 0px; }
+.markdown-body .contains-task-list { padding-left: 0.4em; list-style: none; }
+.markdown-body .task-list-item { list-style: none; }
+.markdown-body .task-list-item-checkbox { vertical-align: middle; accent-color: var(--cm-link); margin: 0px 0.5em 0px 0px; }
+.markdown-body .task-list-item:has(.task-list-item-checkbox:checked) > p, .markdown-body .task-list-item:has(.task-list-item-checkbox:checked) { color: var(--muted-foreground); }
+.markdown-body blockquote { border-left: 3px solid var(--border); color: var(--cm-quote); margin: 0.9em 0px; padding: 0.2em 1em; }
+.markdown-body blockquote > :first-child { margin-top: 0px; }
+.markdown-body blockquote > :last-child { margin-bottom: 0px; }
+.markdown-body hr { border-right-width: medium; border-bottom-width: medium; border-left-width: medium; border-right-style: none; border-bottom-style: none; border-left-style: none; border-right-color: currentcolor; border-bottom-color: currentcolor; border-left-color: currentcolor; border-image: none; border-top: 1px solid var(--border); margin: 1.6em 0px; }
+.markdown-body img { border-radius: var(--radius-sm); max-width: 100%; height: auto; }
+.markdown-body table { border-collapse: collapse; width: max-content; max-width: 100%; margin: 1em 0px; font-size: 0.95em; display: block; overflow: auto; }
+.markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 0.45em 0.9em; }
+.markdown-body th { background-color: var(--code-bg); text-align: left; font-weight: 600; }
+.markdown-body tbody tr:nth-child(2n) { background-color: var(--code-bg); }
+.markdown-body code { border-radius: var(--radius-sm); background-color: var(--code-bg); color: var(--cm-code); padding: 0.15em 0.4em; font-family: "Cascadia Mono", "JetBrains Mono", Consolas, "Microsoft YaHei Mono", monospace; font-size: 0.88em; }
+.markdown-body pre.md-code-block { border: 1px solid var(--border); border-radius: var(--radius-md); background-color: var(--code-bg); margin: 1em 0px; padding: 1em 1.1em; line-height: 1.6; position: relative; overflow: auto; }
+.markdown-body pre.md-code-block code { color: var(--foreground); background: 0px 0px; padding: 0px; font-size: 0.86em; }
+.markdown-body pre.md-code-block[data-lang]::before { content: attr(data-lang); border-bottom-left-radius: var(--radius-sm); background-color: var(--border); color: var(--muted-foreground); letter-spacing: 0.02em; padding: 0.15em 0.6em; font-family: "Cascadia Mono", Consolas, monospace; font-size: 0.72em; position: absolute; top: 0px; right: 0px; }
+.markdown-body .hljs-comment, .markdown-body .hljs-quote { color: var(--cm-comment); font-style: italic; }
+.markdown-body .hljs-keyword, .markdown-body .hljs-selector-tag, .markdown-body .hljs-literal, .markdown-body .hljs-doctag, .markdown-body .hljs-name { color: var(--cm-keyword); }
+.markdown-body .hljs-string, .markdown-body .hljs-regexp, .markdown-body .hljs-addition, .markdown-body .hljs-template-tag, .markdown-body .hljs-selector-attr, .markdown-body .hljs-selector-pseudo { color: var(--cm-string); }
+.markdown-body .hljs-number, .markdown-body .hljs-symbol, .markdown-body .hljs-bullet, .markdown-body .hljs-meta { color: var(--cm-number); }
+.markdown-body .hljs-literal, .markdown-body .hljs-built_in, .markdown-body .hljs-type { color: var(--cm-type); }
+.markdown-body .hljs-title, .markdown-body .hljs-title.function_, .markdown-body .hljs-section { color: var(--cm-func); }
+.markdown-body .hljs-attr, .markdown-body .hljs-attribute, .markdown-body .hljs-variable, .markdown-body .hljs-template-variable, .markdown-body .hljs-property { color: var(--cm-label); }
+.markdown-body .hljs-tag, .markdown-body .hljs-punctuation, .markdown-body .hljs-operator { color: var(--cm-markup); }
+.markdown-body .hljs-deletion { color: var(--destructive); }
+.markdown-body .hljs-emphasis { font-style: italic; }
+.markdown-body .hljs-strong { font-weight: 700; }
+</style>
+</head>
+<body>
+<main class="export-page">
+<p class="export-meta">导出时间 2026/10/11 01:25:31</p>
+<article class="markdown-body">
+<h1 id="md阅读器-导出样例">MD阅读器 · 导出样例</h1>
+<blockquote>
+<p>这段文字是从 Markdown 渲染出来的。导出物是<strong>单个自包含的 HTML 文件</strong> ——
+双击就能在任何浏览器里打开，不需要联网，也不依赖任何外部资源。</p>
+</blockquote>
+<h2 id="排版">排版</h2>
+<p>正文支持 <strong>加粗</strong>、<em>斜体</em>、<s>删除线</s>、<code>行内代码</code>，以及<a href="https://example.com" data-md-link="1" rel="noopener noreferrer nofollow">外部链接</a>。</p>
+<p>引用块：</p>
+<blockquote>
+<p>衡门之下，可以栖迟。
+泌之洋洋，可以乐饥。</p>
+</blockquote>
+<h3 id="列表">列表</h3>
+<ul>
+<li>无序列表第一项</li>
+<li>第二项
+<ul>
+<li>嵌套一层</li>
+</ul>
+</li>
+<li>第三项</li>
+</ul>
+<ol>
+<li>有序列表第一项</li>
+<li>第二项</li>
+</ol>
+<p>任务列表：</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input class="task-list-item-checkbox" checked="" disabled="" type="checkbox"> 单栏所见即所得</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" checked="" disabled="" type="checkbox"> 查找替换</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" checked="" disabled="" type="checkbox"> 底部状态栏</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox"> 导出 PDF</li>
+</ul>
+<h3 id="表格">表格</h3>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>状态</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>实时预览</td>
+<td>已完成</td>
+<td>标记藏在编辑区里就地渲染</td>
+</tr>
+<tr>
+<td>导出 HTML</td>
+<td>已完成</td>
+<td>样式从当前样式表按选择器提取后内联</td>
+</tr>
+<tr>
+<td>多标签页</td>
+<td>未开始</td>
+<td>——</td>
+</tr>
+</tbody>
+</table>
+<h3 id="代码">代码</h3>
+<pre class="md-code-block" data-lang="ts"><code class="hljs language-ts"><span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">slugify</span>(<span class="hljs-params"><span class="hljs-attr">text</span>: <span class="hljs-built_in">string</span></span>): <span class="hljs-built_in">string</span> {
+  <span class="hljs-keyword">return</span> text
+    .<span class="hljs-title function_">trim</span>()
+    .<span class="hljs-title function_">toLowerCase</span>()
+    .<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/[^\p{L}\p{N}\s-]/gu</span>, <span class="hljs-string">""</span>)
+    .<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/\s+/g</span>, <span class="hljs-string">"-"</span>);
+}
+</code></pre>
+<pre class="md-code-block" data-lang="python"><code class="hljs language-python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">count_words</span>(<span class="hljs-params">text: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-built_in">int</span>:
+    <span class="hljs-string">"""中日韩逐字 + 西文按词"""</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">len</span>([c <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> text <span class="hljs-keyword">if</span> c.strip()])
+</code></pre>
+<hr>
+<p>导出时间见正文顶部；样式与编辑时的实时预览一致，深浅主题各自独立。</p>
+
+</article>
+</main>
+</body>
+</html>
